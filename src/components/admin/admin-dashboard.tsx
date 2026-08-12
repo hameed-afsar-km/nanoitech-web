@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, type User } from "firebase/auth";
 import { ExternalLink, LogOut, Save, ShieldAlert, ShieldCheck, Sparkles, Undo2 } from "lucide-react";
 import {
-  ADMIN_EMAILS,
   getAuthClient,
   googleAuthProvider,
   isAdminEmail,
@@ -42,7 +41,18 @@ function LoginCard() {
     try {
       await signInWithPopup(getAuthClient(), googleAuthProvider);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Sign-in failed. Make sure Google sign-in is enabled in Firebase Auth.");
+      const code = (e as { code?: string }).code;
+      if (code === "auth/operation-not-allowed") {
+        setError(
+          "Google sign-in is not enabled for this Firebase project. Ask the project owner to enable it in Firebase Console → Authentication → Sign-in method → Google, then try again.",
+        );
+      } else if (code === "auth/popup-blocked") {
+        setError("The sign-in popup was blocked by your browser. Allow popups for this site and try again.");
+      } else if (code === "auth/popup-closed-by-user") {
+        setError("The sign-in popup was closed before signing in. Try again.");
+      } else {
+        setError(e instanceof Error ? e.message : "Sign-in failed. Please try again.");
+      }
     } finally {
       setBusy(false);
     }
@@ -68,12 +78,6 @@ function LoginCard() {
           {busy ? "Signing in…" : "Continue with Google"}
         </button>
         {error && <p className="mt-4 rounded-xl bg-crimson/10 px-4 py-3 text-[12.5px] text-crimson">{error}</p>}
-        {ADMIN_EMAILS.length > 0 && (
-          <p className="mt-5 rounded-xl bg-cream px-4 py-3 text-[11.5px] text-ink-dim">
-            Access is restricted to:{" "}
-            <span className="font-bold text-magenta-deep">{ADMIN_EMAILS.join(", ")}</span>
-          </p>
-        )}
       </div>
     </div>
   );
@@ -88,9 +92,9 @@ function NotAuthorized({ user, onSignOut }: { user: User; onSignOut: () => void 
         </div>
         <h1 className="font-display text-[22px] text-ink">Access denied</h1>
         <p className="mt-2 text-[13.5px] text-ink-dim">
-          You&apos;re signed in as <strong className="text-ink">{user.email}</strong>, which is not on
-          the admin allowlist. Ask the project owner to add you to{" "}
-          <code className="rounded bg-cream px-1.5 py-0.5 font-mono text-[12px]">NEXT_PUBLIC_ADMIN_EMAILS</code>.
+          You&apos;re signed in as <strong className="text-ink">{user.email}</strong>, but this
+          account isn&apos;t authorized to manage the site. If you believe this is a mistake,
+          contact the site owner.
         </p>
         <button
           onClick={onSignOut}
