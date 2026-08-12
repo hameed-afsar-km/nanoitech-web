@@ -1,0 +1,138 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { DEFAULT_CONTENT } from "./defaults";
+import { loadContent, saveContent, subscribeContent } from "./content-store";
+import type { SiteContent } from "./types";
+
+interface SiteContentContextValue {
+  content: SiteContent;
+  live: boolean;
+  saving: boolean;
+  loadedFromRemote: boolean;
+  setContent: React.Dispatch<React.SetStateAction<SiteContent>>;
+  save: () => Promise<void>;
+  resetToDefaults: () => void;
+}
+
+const SiteContentContext = createContext<SiteContentContextValue | null>(null);
+
+/** True for plain objects (not arrays / null). */
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+/**
+ * Recursively merge a remote (partial) document over the built-in defaults.
+ * Missing nested keys keep the default values; provided arrays/values win.
+ */
+function deepMerge(base: unknown, remote: unknown): unknown {
+  if (!isPlainObject(remote)) return base;
+  const out: Record<string, unknown> = {
+    ...(isPlainObject(base) ? base : {}),
+  };
+  for (const key of Object.keys(remote)) {
+    const rv = remote[key];
+    if (rv === undefined) continue;
+    out[key] =
+      isPlainObject(out[key]) && isPlainObject(rv) ? deepMerge(out[key], rv) : rv;
+  }
+  return out;
+}
+
+/** Merge a remote (partial) document over the built-in defaults. */
+function mergeContent(remote: Partial<SiteContent>): SiteContent {
+  const base: SiteContent = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
+  return deepMerge(base, remote) as SiteContent;
+}
+
+export function SiteContentProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [content, setContent] = useState<SiteContent>(() =>
+    JSON.parse(JSON.stringify(DEFAULT_CONTENT)),
+  );
+  const [loadedFromRemote, setLoadedFromRemote] = useState(false);
+  const [live, setLive] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    let unsub: (() => void) | undefined;
+
+    (async () => {
+      const remote = await loadContent();
+      if (!active) return;
+      if (remote) {
+        setContent(mergeContent(remote));
+        setLoadedFromRemote(true);
+      }
+    })();
+
+    try {
+      unsub = subscribeContent((remote) => {
+        if (!active) return;
+        if (remote) {
+          setContent(mergeContent(remote));
+          setLoadedFromRemote(true);
+        }
+        setLive(true);
+      });
+    } catch {
+      /* not configured / no network — keep defaults */
+    }
+
+    return () => {
+      active = false;
+      unsub?.();
+    };
+  }, []);
+
+  const save = useCallback(async () => {
+    setSaving(true);
+    try {
+      await saveContent(content);
+    } finally {
+      setSaving(false);
+    }
+  }, [content]);
+
+  const resetToDefaults = useCallback(() => {
+    setContent(JSON.parse(JSON.stringify(DEFAULT_CONTENT)));
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      content,
+      live,
+      saving,
+      loadedFromRemote,
+      setContent,
+      save,
+      resetToDefaults,
+    }),
+    [content, live, saving, loadedFromRemote, save, resetToDefaults],
+  );
+
+  return (
+    <SiteContentContext.Provider value={value}>
+      {children}
+    </SiteContentContext.Provider>
+  );
+}
+
+export function useSiteContent(): SiteContentContextValue {
+  const ctx = useContext(SiteContentContext);
+  if (!ctx) throw new Error("useSiteContent must be used within SiteContentProvider");
+  return ctx;
+}

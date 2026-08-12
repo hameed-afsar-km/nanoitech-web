@@ -1,26 +1,158 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ---- Nano I Technology palette (exact from index.html) ---- */
+  --color-ink: #1c1408;
+  --color-ink-dim: #6b6155;
+  --color-cream: #fffaf3;
+  --color-cream-2: #fff1de;
+  --color-white: #ffffff;
+  --color-magenta: #d6236b;
+  --color-magenta-deep: #a81856;
+  --color-orange: #e8720c;
+  --color-orange-deep: #c85a06;
+  --color-green: #2f8f4e;
+  --color-green-deep: #1c6a37;
+  --color-blue: #1f6fa8;
+  --color-blue-deep: #155688;
+  --color-purple: #8e2a6b;
+  --color-purple-deep: #6f1f52;
+  --color-crimson: #b81c2c;
+  --color-crimson-deep: #8f1420;
+  --color-gold: #c9971f;
+  --color-gold-light: #e8b839;
+  --color-line: rgba(28, 20, 8, 0.1);
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-mono: var(--font-plex), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-fraunces), Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: var(--color-magenta);
+    color: #fff;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .wrap {
+    @apply max-w-[1220px] mx-auto px-8;
+  }
+  .eyebrow {
+    @apply font-mono text-[12px] tracking-[0.16em] uppercase text-magenta-deep mb-4 inline-flex items-center gap-2.5 font-medium;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 18px;
+    height: 1px;
+    background: var(--color-magenta-deep);
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 px-6 py-3.5 text-[13.5px] font-extrabold tracking-[0.02em] rounded-[28px] transition-all duration-300 cursor-pointer border-2 border-transparent;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--color-magenta), var(--color-magenta-deep));
+    color: #fff;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(214, 35, 107, 0.32);
+  }
+  .btn-ghost {
+    border-color: var(--color-orange);
+    color: var(--color-orange-deep);
+    background: transparent;
+  }
+  .btn-ghost:hover {
+    background: rgba(232, 114, 12, 0.08);
+  }
+  .grad-orange-magenta {
+    background: linear-gradient(90deg, var(--color-orange), var(--color-magenta));
+  }
+  .grad-magenta {
+    background: linear-gradient(90deg, var(--color-magenta), var(--color-magenta-deep));
+  }
+  .grad-green {
+    background: linear-gradient(90deg, var(--color-green-deep), var(--color-green));
+  }
+  .grad-cta {
+    background: linear-gradient(120deg, var(--color-magenta) 0%, var(--color-purple-deep) 100%);
+  }
+}
+
+/* ---------------- animations ---------------- */
+@keyframes spin-cw {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes float-blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -28px) scale(1.08);
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes slow-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.animate-spin-cw {
+  animation: spin-cw 18s linear infinite;
+}
+.animate-spin-ccw {
+  animation: spin-cw 26s linear infinite reverse;
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+.group:hover .group-hover-zoom {
+  animation: slow-zoom 12s ease-in-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
