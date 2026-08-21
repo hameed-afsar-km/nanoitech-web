@@ -1,93 +1,110 @@
 "use client";
-
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { useSiteContent } from "@/lib/site-content-context";
 
 export default function Navbar() {
   const { content } = useSiteContent();
-  const [open, setOpen] = useState(false);
   const { nav } = content;
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 40);
+    fn();
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const fn = () => setOpen(false);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, [open]);
+
+  useEffect(() => {
+    const fn = () => { if (window.innerWidth >= 1024) setOpen(false); };
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50">
-      <div className="grad-magenta text-white text-[12.5px] py-2.5">
-        <div className="wrap overflow-hidden">
-          <div className="animate-marquee flex w-max gap-20 whitespace-nowrap">
-            {[...content.utilityBar.items, ...content.utilityBar.items].map((item, i) => (
-              <span key={i} className="opacity-95">{item}</span>
-            ))}
-            <span className="opacity-95">{content.utilityBar.follow}</span>
-          </div>
-        </div>
-      </div>
-
-      <nav className="bg-white/90 backdrop-blur-md border-b border-line py-3.5">
-        <div className="wrap flex items-center justify-between gap-7">
-          <Link href="#top" className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/brand-logo.png" alt="Nano I Technology" className="h-11 w-auto" />
-            <span className="leading-tight">
-              <span className="block font-display text-[16.5px] tracking-[0.01em] text-magenta-deep font-bold">
-                {nav.brandName}
-              </span>
-              <span className="block text-[10px] tracking-[0.05em] uppercase text-orange-deep font-bold">
-                {nav.brandTag}
-              </span>
-            </span>
+    <motion.header
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-x-0 top-0 z-50"
+    >
+      <div className={`transition-all duration-300 ${
+        scrolled
+          ? "bg-white/80 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.04)]"
+          : "bg-transparent"
+      }`}>
+        <div className="wrap h-[60px] lg:h-[64px] flex items-center justify-between gap-6">
+          {/* Brand */}
+          <Link href="#top" className="flex items-center gap-2.5 shrink-0">
+            <motion.img src="/images/brand-logo.png" alt="Nano I Technology"
+              className="h-[20px] w-auto object-contain"
+              whileHover={{ scale: 1.04 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
           </Link>
 
-          <div className="hidden lg:flex gap-8 text-[13.5px] font-bold">
+          {/* Links */}
+          <nav className="hidden lg:flex items-center gap-0">
             {nav.links.map((l) => (
-              <a key={l.href} href={l.href} className="text-ink/75 hover:text-ink hover:text-magenta-deep transition-opacity">
+              <a key={l.href} href={l.href}
+                className="relative px-4 py-2 text-[12px] font-medium text-ink/50 hover:text-ink transition-colors duration-200 rounded-full hover:bg-cream-2">
                 {l.label}
               </a>
             ))}
-          </div>
+          </nav>
 
+          {/* Actions */}
           <div className="flex items-center gap-3">
-            <a href="#contact" className="hidden sm:inline-flex grad-orange-magenta text-white px-6 py-2.5 text-[13px] font-bold rounded-[24px] hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(214,35,107,0.35)] transition-all whitespace-nowrap">
+            <motion.a href="#contact"
+              className="btn btn-fire btn-sm hidden md:inline-flex"
+              whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               {nav.cta}
-            </a>
-            <button
-              className="lg:hidden p-2 text-ink"
-              onClick={() => setOpen((v) => !v)}
-              aria-label="Toggle menu"
-            >
-              {open ? <X size={22} /> : <Menu size={22} />}
+            </motion.a>
+            <button onClick={() => setOpen(v => !v)}
+              className="lg:hidden w-9 h-9 rounded-full bg-cream-2 flex items-center justify-center text-ink/50 hover:text-ink transition-colors cursor-pointer"
+              aria-label="Toggle menu">
+              {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
         </div>
 
+        {/* Mobile drawer */}
         <AnimatePresence>
           {open && (
             <motion.div
+              key="drawer"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="lg:hidden overflow-hidden border-t border-line bg-white"
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="lg:hidden overflow-hidden bg-white/95 backdrop-blur-xl border-t border-line"
             >
-              <div className="wrap py-4 flex flex-col gap-3">
-                {nav.links.map((l) => (
-                  <a
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setOpen(false)}
-                    className="text-[14px] font-bold text-ink/80 hover:text-magenta-deep"
-                  >
+              <div className="wrap py-6 flex flex-col gap-0.5">
+                {nav.links.map((l, i) => (
+                  <motion.a key={l.href} href={l.href} onClick={() => setOpen(false)}
+                    initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="py-3 px-4 text-[14px] font-medium text-ink/50 hover:text-ink hover:bg-cream-2 rounded-xl transition-all">
                     {l.label}
-                  </a>
+                  </motion.a>
                 ))}
-                <a href="#contact" onClick={() => setOpen(false)} className="grad-orange-magenta text-white text-center px-6 py-3 text-[13px] font-bold rounded-[24px]">
+                <a href="#contact" onClick={() => setOpen(false)}
+                  className="mt-3 btn btn-fire btn-md w-full justify-center">
                   {nav.cta}
                 </a>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
-    </header>
+      </div>
+    </motion.header>
   );
 }

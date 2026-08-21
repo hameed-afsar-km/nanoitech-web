@@ -1,114 +1,119 @@
 "use client";
-
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef, useState } from "react";
 import { useSiteContent } from "@/lib/site-content-context";
-import { Reveal, SectionHead, fadeUp, stagger } from "./motion";
+import { Reveal } from "./motion";
+import { ContourBands, ContourRings } from "./backdrops";
+import { MissionSection, VisionSection } from "./mission-vision";
+import { Lightbox } from "./lightbox";
+
+const STAT_COLORS = ["#2f8f4e", "#d6236b", "#e8720c", "#c9971f"];
+
+function CountUp({ value, color }: { value: string; color: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  return (
+    <motion.span
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="font-display font-bold leading-none tracking-[-0.04em]"
+      style={{ color, fontSize: "clamp(44px, 5vw, 72px)" }}
+    >
+      {value}
+    </motion.span>
+  );
+}
 
 export default function About() {
   const { content } = useSiteContent();
   const { about } = content;
+  const [zoom, setZoom] = useState(false);
 
   return (
-    <section className="relative py-24 overflow-hidden bg-white photo-bg" id="about">
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: "url(/images/bg-about.jpg)" }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 65% 70% at 50% 45%, rgba(255,250,240,0.93) 0%, rgba(255,250,240,0.6) 100%)",
-        }}
-      />
-      <div className="wrap relative z-10">
-        <SectionHead
-          eyebrow={about.eyebrow}
-          title={about.title}
-          description={about.description}
-        />
-
-        {/* stats — bento row */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
-        >
-          {about.stats.map((s) => (
-            <motion.div
-              key={s.num}
-              variants={fadeUp}
-              className="bg-white rounded-2xl border border-line p-6 text-center shadow-sm hover:shadow-[0_18px_40px_-20px_rgba(28,20,8,0.35)] hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="font-display text-[30px] text-magenta-deep font-bold">
-                {s.num}
+    <>
+      {/* ── Stats Section (Light) ─────────────────────────── */}
+      <section id="about" className="relative bg-green-light overflow-hidden">
+        <ContourBands />
+        <div className="wrap relative z-10 py-16 lg:py-20">
+          <Reveal>
+            <div className="text-center max-w-[800px] mx-auto mb-10 lg:mb-14">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <span className="w-8 h-[2px] bg-green rounded-full" />
+                <span className="text-[11px] font-semibold tracking-[0.15em] text-green uppercase">About</span>
+                <span className="w-8 h-[2px] bg-green rounded-full" />
               </div>
-              <div className="text-[12.5px] text-ink-dim mt-1.5 leading-snug">
-                {s.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* vision + mission — bento 7/5 */}
-        <div className="grid lg:grid-cols-12 gap-5 mb-12">
-          <Reveal className="lg:col-span-7">
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="h-full rounded-2xl bg-gradient-to-br from-green-deep to-green p-8 text-white shadow-[0_24px_50px_-24px_rgba(28,20,8,0.5)]"
-            >
-              <h3 className="font-display text-[20px] mb-3.5 text-white">{about.visionTitle}</h3>
-              <p className="text-[14.5px] text-white/90 leading-relaxed max-w-[46ch]">
-                {about.vision}
+              <h2 className="font-display font-bold text-ink leading-[0.98] tracking-[-0.03em]"
+                style={{ fontSize: "clamp(36px, 5.5vw, 76px)" }}>
+                Nature, nanotechnology
+                <br />
+                <span className="grad-text-loop">&amp; 20+ years of research</span>
+              </h2>
+              <p className="mt-8 mx-auto max-w-[520px] text-[15px] text-ink-dim leading-[1.8]">
+                {about.description}
               </p>
-            </motion.div>
+            </div>
           </Reveal>
-          <Reveal delay={0.12} className="lg:col-span-5">
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="h-full rounded-2xl bg-cream-2 p-8 border border-line"
-            >
-              <h3 className="font-display text-[19px] text-green-deep mb-4">
-                {about.missionTitle}
-              </h3>
-              <ul className="flex flex-col gap-2.5">
-                {about.missionItems.map((item, i) => (
-                  <li key={i} className="text-[13.5px] text-ink-dim pl-[18px] relative">
-                    <span className="absolute left-0 text-gold">—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 max-w-[1000px] mx-auto">
+            {about.stats.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.1}>
+                <div className="text-center p-8 bg-white rounded-[20px] border border-line shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+                  <CountUp value={s.num} color={STAT_COLORS[i]} />
+                  <p className="mt-3 text-[11px] font-medium text-ink-muted leading-snug">
+                    {s.label}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Mission (GSAP pinned scroll) ──────────────────── */}
+      <MissionSection />
+
+      {/* ── Vision (word-reveal scroll) ───────────────────── */}
+      <VisionSection />
+
+      {/* ── Brand Identity ────────────────────────────────── */}
+      <section className="relative bg-orange-light overflow-hidden">
+        <ContourRings tint="magenta" tintAlt="orange" />
+        <div className="wrap relative z-10 py-16 lg:py-20">
+          <Reveal>
+            <div className="text-center mb-10 lg:mb-12">
+              <span className="section-label text-orange">Brand Identity</span>
+            </div>
+          </Reveal>
+          <div className="max-w-[1080px] mx-auto">
+            <Reveal>
+              <motion.div
+                whileHover={{ scale: 1.003 }}
+                transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                onClick={() => setZoom(true)}
+                className="rounded-[20px] overflow-hidden bg-white shadow-[0_24px_60px_rgba(0,0,0,0.04)] cursor-zoom-in"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/poster.jpg" alt="Brand Story" loading="lazy" decoding="async"
+                  className="w-full h-auto object-contain block" />
+              </motion.div>
+            </Reveal>
+          </div>
+          <Reveal delay={0.1}>
+            <p className="mt-10 text-center font-display font-semibold text-[20px] sm:text-[26px] text-ink leading-[1.3] max-w-[600px] mx-auto">
+              &ldquo;The Third Eye to Visualize, Innovate, and Solve.&rdquo;
+            </p>
           </Reveal>
         </div>
+      </section>
 
-        {/* core areas — bento 6-col: 3+3 / 2+2+2 */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-2 lg:grid-cols-6 gap-4"
-        >
-          {about.coreAreas.map((c, i) => (
-            <motion.div
-              key={c.text}
-              variants={fadeUp}
-              className={`rounded-xl bg-cream-2 p-5 text-center hover:bg-cream-2/70 hover:-translate-y-1 transition-all duration-300 ${
-                i < 2 ? "lg:col-span-3" : "lg:col-span-2"
-              }`}
-            >
-              <div className="text-[26px] mb-2.5">{c.icon}</div>
-              <div className="text-[12.5px] font-bold text-ink leading-snug">{c.text}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+      <Lightbox
+        src={zoom ? "/images/poster.jpg" : null}
+        alt="Brand Story"
+        onClose={() => setZoom(false)}
+      />
+    </>
   );
 }

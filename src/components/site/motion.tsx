@@ -1,89 +1,57 @@
 "use client";
+import { motion, type Variants, useScroll, useSpring } from "framer-motion";
+import React from "react";
 
-import { motion, type Variants } from "framer-motion";
+export const ease = [0.22, 1, 0.36, 1] as const;
 
-export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  },
+export const vUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
 };
-
-export const stagger: Variants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.09, delayChildren: 0.05 },
-  },
+export const vLeft: Variants = {
+  hidden: { opacity: 0, x: -40 },
+  show:   { opacity: 1, x: 0, transition: { duration: 0.7, ease } },
 };
-
-export const scaleIn: Variants = {
+export const vRight: Variants = {
+  hidden: { opacity: 0, x: 40 },
+  show:   { opacity: 1, x: 0, transition: { duration: 0.7, ease } },
+};
+export const vScale: Variants = {
   hidden: { opacity: 0, scale: 0.92 },
-  show: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
+  show:   { opacity: 1, scale: 1, transition: { duration: 0.6, ease } },
+};
+export const vStagger: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
 };
 
 export function Reveal({
-  children,
-  className,
-  delay = 0,
-  y = 28,
+  children, className = "", delay = 0,
+  dir = "up",
 }: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-  y?: number;
+  children: React.ReactNode; className?: string; delay?: number;
+  dir?: "up"|"left"|"right"|"scale"|"none";
 }) {
+  const map = { up: vUp, left: vLeft, right: vRight, scale: vScale, none: {} };
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <motion.div className={className} variants={map[dir]}
+      initial="hidden" whileInView="show"
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ delay }}>
       {children}
     </motion.div>
   );
 }
 
-export function SectionHead({
-  eyebrow,
-  title,
-  description,
-  center = true,
-}: {
-  eyebrow: string;
-  title: string;
-  description?: string;
-  center?: boolean;
-}) {
+export function ProgressBar() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 150, damping: 30 });
   return (
     <motion.div
-      variants={stagger}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
-      className={`max-w-[640px] mb-14 ${center ? "mx-auto text-center" : ""}`}
+      style={{ scaleX, transformOrigin: "0%" }}
+      className="fixed top-0 left-0 right-0 z-[500] h-[3px]"
     >
-      <motion.div
-        variants={fadeUp}
-        className={`eyebrow ${center ? "justify-center" : ""}`}
-      >
-        {eyebrow}
-      </motion.div>
-      <motion.h2 variants={fadeUp} className="text-[clamp(26px,3.2vw,40px)] text-ink my-4">
-        {title}
-      </motion.h2>
-      {description && (
-        <motion.p variants={fadeUp} className="text-ink-dim text-[15.5px]">
-          {description}
-        </motion.p>
-      )}
+      <div className="h-full bg-gradient-to-r from-magenta via-orange to-green" />
     </motion.div>
   );
 }

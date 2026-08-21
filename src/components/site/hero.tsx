@@ -1,112 +1,195 @@
 "use client";
-
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useSiteContent } from "@/lib/site-content-context";
-import { fadeUp, stagger } from "./motion";
+import { TriDots } from "./geo-svg";
+import { TriAurora, ContourRings, GrainVeil } from "./backdrops";
+import { FloraCorners } from "./nature";
 
-const pillColors = ["bg-green", "bg-magenta", "bg-orange", "bg-purple"];
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const FEATURE_COLORS = ["#d6236b", "#e8720c", "#2f8f4e"];
 
 export default function Hero() {
   const { content } = useSiteContent();
   const { hero, products } = content;
+  const ref = useRef<HTMLElement>(null);
 
-  const featured = hero.featuredProductId
-    ? products.find((p) => p.id === hero.featuredProductId)
-    : undefined;
-  const heroImg = featured?.image ?? "/images/hero.jpg";
-  const heroLabel = featured?.name ?? "";
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const yImg = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  const featured = products.find((p) => p.id === (hero.featuredProductId ?? products[0]?.id)) ?? products[0];
+  const secondary = products.find((p) => p.id !== featured?.id) ?? products[0];
 
   return (
-    <section
-      className="relative pt-16 pb-0 overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, var(--color-cream) 0%, var(--color-cream-2) 100%)",
-      }}
-      id="top"
-    >
-      {/* ambient blobs */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(47,143,78,0.18), transparent 70%)" }}
-        animate={{ x: [0, 30, 0], y: [0, 24, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute top-40 right-[-6rem] w-[28rem] h-[28rem] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(214,35,107,0.16), transparent 70%)" }}
-        animate={{ x: [0, -26, 0], y: [0, 30, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-8rem] left-1/3 w-80 h-80 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(232,114,12,0.14), transparent 70%)" }}
-        animate={{ x: [0, 22, 0], y: [0, -20, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
+    <section id="top" ref={ref} className="relative min-h-[100svh] flex items-center overflow-hidden bg-cream">
+      <TriAurora />
+      <ContourRings tint="magenta" tintAlt="green" />
+      <FloraCorners />
+      <GrainVeil />
 
-      <div className="wrap relative grid lg:grid-cols-[1fr_0.82fr] gap-14 items-center pb-14">
-        <motion.div variants={stagger} initial="hidden" animate="show">
-          <motion.div variants={fadeUp} className="eyebrow">
-            {hero.eyebrow}
-          </motion.div>
-          <motion.h1
-            variants={fadeUp}
-            className="text-[clamp(34px,4.4vw,54px)] leading-[1.08] mb-6 text-green-deep"
-          >
-            {hero.title1}
-            <br />
-            <span className="text-orange italic">{hero.accent1}</span>{" "}
-            <span className="text-magenta">{hero.accent2}</span>
-          </motion.h1>
-          <motion.p variants={fadeUp} className="text-[16.5px] text-ink-dim max-w-[500px] mb-8">
-            {hero.lede}
-          </motion.p>
+      <motion.div style={{ opacity }} className="relative z-10 w-full pt-32 lg:pt-36 pb-24">
+        <div className="wrap grid lg:grid-cols-[1.05fr_0.95fr] gap-16 lg:gap-20 items-center">
 
-          <motion.div
-            variants={stagger}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-9"
-          >
-            {hero.features.map((f, i) => (
-              <motion.div key={f.label} variants={fadeUp} className="text-left">
-                <div
-                  className={`w-11 h-11 rounded-full flex items-center justify-center text-[18px] text-white mb-2.5 ${pillColors[i % pillColors.length]}`}
-                >
-                  {f.icon}
+          {/* ── Content column ── */}
+          <div className="text-center lg:text-left">
+            {/* Eyebrow */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease }}
+              className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-line bg-white/70 backdrop-blur-sm mb-8"
+            >
+              <TriDots />
+              <span className="text-[11px] font-medium tracking-[0.15em] text-ink-muted uppercase">{hero.eyebrow}</span>
+            </motion.div>
+
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2, ease }}
+              className="font-display font-bold text-ink leading-[0.98] tracking-[-0.04em]"
+              style={{ fontSize: "clamp(44px, 5.6vw, 84px)" }}
+            >
+              {hero.title1}
+              <br />
+              <span className="bg-gradient-to-r from-magenta via-orange to-green bg-clip-text text-transparent">
+                {hero.accent1} {hero.accent2}
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.45, ease }}
+              className="mt-7 mx-auto lg:mx-0 max-w-[500px] text-[16px] text-ink-dim leading-[1.8]"
+            >
+              {hero.lede}
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.6, ease }}
+              className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4"
+            >
+              <motion.a
+                href={hero.primaryCta.href}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="btn btn-fire btn-lg"
+              >
+                {hero.primaryCta.label.replace(/→$/, "")} <ArrowRight size={14} />
+              </motion.a>
+              <motion.a
+                href={hero.secondaryCta.href}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn btn-outline-dark btn-lg"
+              >
+                {hero.secondaryCta.label.replace(/→$/, "")} <ArrowRight size={14} />
+              </motion.a>
+            </motion.div>
+
+            {/* Trust row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="mt-12 pt-7 hairline-t flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3"
+            >
+              {hero.features.slice(0, 3).map((f, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: FEATURE_COLORS[i % 3] }} />
+                  <span className="text-[12px] font-medium text-ink/40">{f.label}</span>
                 </div>
-                <div className="text-[11.5px] font-extrabold tracking-[0.02em] text-ink uppercase leading-tight">
-                  {f.label}
+              ))}
+            </motion.div>
+          </div>
+
+          {/* ── Product showcase column ── */}
+          <motion.div style={{ y: yImg }} className="relative pb-10 lg:pb-0">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.4, ease }}
+              className="relative mx-auto max-w-[400px] lg:max-w-none"
+            >
+              {/* Featured card */}
+              <div className="rounded-[28px] overflow-hidden bg-white shadow-[0_32px_80px_rgba(0,0,0,0.08)] border border-line">
+                {featured?.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={featured.image} alt={featured.name}
+                    className="w-full aspect-[4/5] object-cover" />
+                ) : (
+                  <div className="w-full aspect-[4/5] flex items-center justify-center font-display text-8xl font-semibold text-ink/5">
+                    {featured?.name?.[0]}
+                  </div>
+                )}
+                <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-line">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-semibold text-ink truncate">{featured?.name}</p>
+                    <p className="text-[12px] text-ink-muted mt-0.5">{featured?.category}</p>
+                  </div>
+                  <span className="tag bg-magenta-light text-magenta flex-shrink-0">Featured</span>
+                </div>
+              </div>
+
+              {/* Floating secondary */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-8 -left-4 sm:-left-10 w-[140px] sm:w-[170px]"
+              >
+                <div className="rounded-[18px] overflow-hidden bg-white shadow-[0_16px_40px_rgba(0,0,0,0.07)] border border-line">
+                  {secondary?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={secondary.image} alt={secondary.name} loading="lazy" decoding="async"
+                      className="w-full aspect-square object-cover" />
+                  ) : (
+                    <div className="w-full aspect-square flex items-center justify-center font-display text-5xl font-semibold text-ink/5">
+                      {secondary?.name?.[0]}
+                    </div>
+                  )}
+                  <p className="px-3.5 py-2.5 text-[11px] font-semibold text-ink truncate border-t border-line">
+                    {secondary?.name}
+                  </p>
                 </div>
               </motion.div>
+
+              {/* Tri-color dots accent */}
+              <motion.div
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                className="absolute -top-7 right-6 sm:right-10"
+              >
+                <TriDots size="md" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Trust marquee */}
+      <div className="absolute bottom-0 inset-x-0 z-30 border-t border-line bg-white/80 backdrop-blur-xl overflow-hidden">
+        <div className="flex w-max">
+          <div className="anim-marquee flex shrink-0 items-center">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex shrink-0 items-center">
+                {content.trustStrip.map((t, i) => (
+                  <span key={i} className="flex items-center gap-2.5 px-8 py-3 text-[11px] font-medium tracking-wide text-ink/30 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: i % 3 === 0 ? "#d6236b" : i % 3 === 1 ? "#e8720c" : "#2f8f4e" }} />
+                    {t.icon} {t.text.replace(/\n/g, " ")}
+                  </span>
+                ))}
+              </div>
             ))}
-          </motion.div>
-
-          <motion.div variants={fadeUp} className="flex flex-wrap gap-3.5">
-            <a href={hero.primaryCta.href} className="btn btn-primary">
-              {hero.primaryCta.label}
-            </a>
-            <a href={hero.secondaryCta.href} className="btn btn-ghost">
-              {hero.secondaryCta.label}
-            </a>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-2xl overflow-hidden shadow-[0_30px_60px_-20px_rgba(28,20,8,0.35)] order-first lg:order-none"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={heroImg} alt={heroLabel || "Nano I Technology"} className="w-full block" />
-          {heroLabel && (
-            <div className="absolute left-3.5 right-3.5 bottom-3.5 z-[2] bg-ink/70 text-white font-display text-[15px] py-2 px-3.5 rounded-[10px] text-center backdrop-blur-sm">
-              {heroLabel}
-            </div>
-          )}
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
