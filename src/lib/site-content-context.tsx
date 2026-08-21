@@ -54,13 +54,33 @@ function mergeContent(remote: Partial<SiteContent>): SiteContent {
   return deepMerge(base, remote) as SiteContent;
 }
 
+/** Last-known-good remote content, so flaky networks never flash defaults. */
+const CACHE_KEY = "nanoitech:content-cache";
+
+function readCache(): Partial<SiteContent> | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<SiteContent>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(remote: Partial<SiteContent>) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(remote));
+  } catch {
+    /* storage full / unavailable — ignore */
+  }
+}
+
 export function SiteContentProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [content, setContent] = useState<SiteContent>(() =>
-    JSON.parse(JSON.stringify(DEFAULT_CONTENT)),
+  const [content, setContent] = useState<SiteContent>(
+    () => JSON.parse(JSON.stringify(DEFAULT_CONTENT)),
   );
   const [loadedFromRemote, setLoadedFromRemote] = useState(false);
   const [live, setLive] = useState(false);
@@ -70,26 +90,31 @@ export function SiteContentProvider({
     let active = true;
     let unsub: (() => void) | undefined;
 
+    const applyRemote = (remote: Partial<SiteContent> | null) => {
+      if (!remote) return;
+      setContent(mergeContent(remote));
+      writeCache(remote);
+      setLoadedFromRemote(true);
+    };
+
+    /* Client-only: restore last-known-good content before the
+       network round-trip (never during SSR / first render). */
+    applyRemote(readCache());
+
     (async () => {
       const remote = await loadContent();
       if (!active) return;
-      if (remote) {
-        setContent(mergeContent(remote));
-        setLoadedFromRemote(true);
-      }
+      if (remote) applyRemote(remote);
     })();
 
     try {
       unsub = subscribeContent((remote) => {
         if (!active) return;
-        if (remote) {
-          setContent(mergeContent(remote));
-          setLoadedFromRemote(true);
-        }
+        if (remote) applyRemote(remote);
         setLive(true);
       });
     } catch {
-      /* not configured / no network — keep defaults */
+      /* not configured / no network — keep cached or defaults */
     }
 
     return () => {

@@ -38,7 +38,7 @@ export default function HomeClient() {
         }}
       >
         <Navbar />
-        <main>
+        <main className="relative z-10 bg-cream">
           <Hero />
           <About />
           <Story />

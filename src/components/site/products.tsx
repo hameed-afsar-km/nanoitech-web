@@ -232,7 +232,7 @@ export default function Products() {
               exit={{ opacity: 0, y: 30, scale: 0.96 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="relative z-10 w-full max-w-[700px] bg-cream rounded-[24px] overflow-hidden my-8 shadow-[0_32px_80px_rgba(0,0,0,0.12)]">
               <div className="h-[3px] bg-gradient-to-r from-magenta via-orange to-green" />
-              <div className="flex items-center justify-between p-6 pb-0">
+              <div className="flex items-center justify-between p-4 pb-0 sm:p-6 sm:pb-0">
                 <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink-muted flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-green" /> Product Details
                 </span>
@@ -241,12 +241,12 @@ export default function Products() {
                   <X size={15} />
                 </button>
               </div>
-              <div className="grid sm:grid-cols-[0.85fr_1.15fr] gap-8 p-6">
-                <div className="relative rounded-[16px] overflow-hidden bg-cream-2">
+              <div className="grid sm:grid-cols-[280px_1fr] gap-5 sm:gap-8 p-4 sm:p-6">
+                <div className="relative rounded-[16px] overflow-hidden bg-cream-2 aspect-square min-h-[250px]">
                   {modal.image ? (
-                    <img src={modal.image} alt={modal.name} className="w-full aspect-[4/3] object-cover block" />
+                    <img src={modal.image} alt={modal.name} className="absolute inset-0 w-full h-full object-cover" />
                   ) : (
-                    <div className="py-16 flex items-center justify-center"><TriDots size="lg" /></div>
+                    <div className="w-full h-full flex items-center justify-center"><TriDots size="lg" /></div>
                   )}
                 </div>
                 <div className="flex flex-col">

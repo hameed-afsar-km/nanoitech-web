@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { useSiteContent } from "@/lib/site-content-context";
 import { Reveal } from "./motion";
-import { ContourBands } from "./backdrops";
+import { DotField } from "./backdrops";
 
 const STEP_COLORS = ["#2f8f4e", "#d6236b", "#e8720c"];
 const STEP_LIGHT = ["#7fd39b", "#ff7ab0", "#ffa45c"];
@@ -19,7 +19,7 @@ export default function Technology() {
 
   return (
     <section id="technology" className="relative bg-ink overflow-hidden">
-      <ContourBands dark />
+      <DotField />
 
       <div className="wrap relative z-10 py-16 lg:py-20">
         <Reveal>

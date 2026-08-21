@@ -41,7 +41,7 @@ export default function Story() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/bg-about.jpg" alt="" aria-hidden="true" decoding="async"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.07] pointer-events-none select-none" />
-        <motion.div ref={trackRef} style={{ x }} className="relative z-10 flex items-stretch gap-0 pl-[6vw] pr-[14vw] will-change-transform">
+        <motion.div ref={trackRef} style={{ x }} className="relative z-10 flex items-stretch gap-0 pl-[6vw] pr-[18vw] will-change-transform">
           {/* Intro panel */}
           <div className="w-[85vw] md:w-[46vw] flex-shrink-0 flex flex-col justify-center pr-6 md:pr-12">
             <div className="inline-flex items-center gap-3 mb-6 w-max">
@@ -94,22 +94,26 @@ export default function Story() {
           ))}
 
           {/* Outro panel */}
-          <div className="w-[82vw] md:w-[40vw] flex-shrink-0 flex flex-col justify-center md:pl-8">
-            <div className="py-10 border-t-[2px] border-orange/30">
-              <div className="inline-flex items-center gap-2 mb-6">
+          <div className="w-[86vw] md:w-[54vw] flex-shrink-0 flex flex-col justify-center md:pl-14 lg:pl-20 md:pr-6">
+            <div className="py-12 border-t-[2px] border-orange/30 max-w-[640px]">
+              <div className="inline-flex items-center gap-2 mb-7">
                 <span className="w-2 h-2 rounded-full bg-orange" />
                 <span className="section-label text-ink-muted">Epilogue</span>
               </div>
-              <p className="font-display font-semibold text-[26px] sm:text-[28px] leading-[1.25] tracking-tight text-ink">
-                From the family kitchen to the laboratory — the lineage continues.
+              <p className="font-display font-bold text-ink leading-[1.04] tracking-[-0.03em]"
+                style={{ fontSize: "clamp(34px, 4.4vw, 66px)" }}>
+                From the family kitchen to the
+                <br />
+                laboratory —{" "}
+                <span className="grad-text-loop">the lineage continues.</span>
               </p>
-              <p className="mt-5 text-[16px] text-ink-dim leading-[1.8]">
+              <p className="mt-8 text-[16px] md:text-[17px] text-ink-dim leading-[1.85] max-w-[420px]">
                 Discover how five generations of botanical knowledge became a nanoemulsion product line.
               </p>
               <motion.a
                 href="#about"
                 whileHover={{ x: 4 }}
-                className="inline-flex items-center gap-2 mt-8 text-[14px] font-semibold text-magenta"
+                className="inline-flex items-center gap-2 mt-10 text-[14px] font-semibold text-magenta"
               >
                 Meet the science <ArrowRight size={14} />
               </motion.a>

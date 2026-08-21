@@ -22,10 +22,14 @@ export default function Footer() {
   )}`;
 
   return (
-    <footer className="relative bg-ink overflow-hidden">
+    /* Sticky curtain: the footer pins to the viewport bottom BEHIND
+       the page (main is z-10 with an opaque bg) and is uncovered as
+       the contact section scrolls away at the end. */
+    <div className="relative z-0 sticky bottom-0">
+      <footer className="relative bg-ink overflow-hidden min-h-[100svh] flex flex-col">
       <GradientBar />
 
-      <div className="wrap pt-14 lg:pt-20 pb-10">
+      <div className="wrap pt-14 lg:pt-20 pb-10 flex-1 flex flex-col w-full">
         {/* Closing headline */}
         <div className="text-center mb-12 lg:mb-16">
           <h2 className="font-display font-bold text-cream leading-[1.05] tracking-[-0.02em] max-w-[700px] mx-auto"
@@ -97,7 +101,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom row */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-cream/40">
+        <div className="mt-auto border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-cream/40">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-5 text-center sm:text-left">
             <span>{footer.copyright}</span>
             <span className="hidden sm:inline">&bull;</span>
@@ -112,6 +116,7 @@ export default function Footer() {
           </motion.button>
         </div>
       </div>
-    </footer>
+      </footer>
+    </div>
   );
 }
