@@ -40,9 +40,11 @@ export function subscribeContent(
 
 /** Persist the content document (merges arrays/objects). */
 export async function saveContent(content: SiteContent): Promise<void> {
+  /* JSON round-trip strips `undefined` values that Firestore rejects */
+  const clean = JSON.parse(JSON.stringify(content)) as SiteContent;
   await setDoc(
     doc(getDb(), CONTENT_PATH),
-    { ...content, updatedAt: serverTimestamp() },
+    { ...clean, updatedAt: serverTimestamp() },
     { merge: true },
   );
 }

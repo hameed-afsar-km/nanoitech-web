@@ -179,7 +179,22 @@ export function VisionSection() {
   }, []);
 
   return (
-    <section ref={root} className="relative bg-cream overflow-hidden">
+    <section ref={root} className="relative overflow-hidden">
+      {/* Wisdom background */}
+      <div className="absolute inset-0" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/bg-wisdom.jpg"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+        {/* Readability veil + edge fades into the page */}
+        <div className="absolute inset-0 bg-cream/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cream via-transparent to-cream" />
+      </div>
+
       <div className="wrap relative z-10 py-16 lg:py-24">
         <div className="max-w-[920px] mx-auto text-center">
           <div className="inline-flex items-center gap-2 mb-7">

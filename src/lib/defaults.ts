@@ -113,7 +113,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       category: "Aquaculture · Shrimp Infection Care",
       filter: "aqua",
       badge: "★ Star Product",
-      image: "/images/product-nanoshield.jpg",
+      image: "https://res.cloudinary.com/nckmpyo4/image/upload/v1787339372/products/x2kinsnjrzcwsvqlblsp.jpg",
       bullets: [
         "Boosts growth & survival rates",
         "Prevents & controls bacterial infections",
@@ -129,7 +129,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       name: "Rootique™",
       category: "Hair Growth & Root Care",
       filter: "personal",
-      image: "/images/product-rootique.jpg",
+      image: "https://res.cloudinary.com/nckmpyo4/image/upload/v1787339376/products/cnhu9r9qghk8uwb76exr.jpg",
       bullets: [
         "Nourishes hair, strengthens roots",
         "Reduces hair fall",
@@ -145,7 +145,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       name: "HerboRelief™",
       category: "Pain Management",
       filter: "health",
-      image: "/images/product-herborelief.jpg",
+      image: "https://res.cloudinary.com/nckmpyo4/image/upload/v1787339379/products/haj07nz0jtnlda5mbj8w.jpg",
       bullets: [
         "Relieves joint & muscle pain",
         "Reduces inflammation",
@@ -161,7 +161,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       name: "CocoRosé™",
       category: "Hair Care",
       filter: "personal",
-      image: "/images/product-cocorose.jpg",
+      image: "https://res.cloudinary.com/nckmpyo4/image/upload/v1787339381/products/zgxsobd3dme4sy3ot4uz.jpg",
       bullets: [
         "Deeply nourishes & strengthens",
         "Enhances natural shine",
@@ -177,7 +177,7 @@ export const DEFAULT_CONTENT: SiteContent = {
       name: "VenoRestore™",
       category: "Vein & Circulation Care",
       filter: "health",
-      image: "/images/product-venorestore.jpg",
+      image: "https://res.cloudinary.com/nckmpyo4/image/upload/v1787339386/products/d6foc0vjudvugs3lzkcx.jpg",
       bullets: [
         "Supports healthy veins",
         "Improves circulation",

@@ -6,15 +6,34 @@ import { useSiteContent } from "@/lib/site-content-context";
 import { TriDots } from "./geo-svg";
 import { TriAurora, ContourRings, GrainVeil } from "./backdrops";
 import { FloraCorners } from "./nature";
+import { ShinyButton } from "@/components/ui/shiny-button";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const FEATURE_COLORS = ["#d6236b", "#e8720c", "#2f8f4e"];
 
-export default function Hero() {
+/* Entrance variants — played only after the splash screen clears */
+const rise = {
+  hidden: { opacity: 0, y: 28 },
+  show: (delay: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, delay, ease },
+  }),
+};
+const fadeIn = {
+  hidden: { opacity: 0 },
+  show: (delay: number) => ({
+    opacity: 1,
+    transition: { duration: 0.9, delay, ease },
+  }),
+};
+
+export default function Hero({ started = true }: { started?: boolean }) {
   const { content } = useSiteContent();
   const { hero, products } = content;
   const ref = useRef<HTMLElement>(null);
+  const anim = started ? "show" : "hidden";
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yImg = useTransform(scrollYProgress, [0, 1], [0, 50]);
@@ -37,9 +56,8 @@ export default function Hero() {
           <div className="text-center lg:text-left">
             {/* Eyebrow */}
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease }}
+              variants={rise} custom={0.05}
+              initial="hidden" animate={anim}
               className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-line bg-white/70 backdrop-blur-sm mb-8"
             >
               <TriDots />
@@ -48,9 +66,8 @@ export default function Hero() {
 
             {/* Headline */}
             <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2, ease }}
+              variants={rise} custom={0.18}
+              initial="hidden" animate={anim}
               className="font-display font-bold text-ink leading-[0.98] tracking-[-0.04em]"
               style={{ fontSize: "clamp(44px, 5.6vw, 84px)" }}
             >
@@ -62,9 +79,8 @@ export default function Hero() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.45, ease }}
+              variants={rise} custom={0.34}
+              initial="hidden" animate={anim}
               className="mt-7 mx-auto lg:mx-0 max-w-[500px] text-[16px] text-ink-dim leading-[1.8]"
             >
               {hero.lede}
@@ -72,19 +88,15 @@ export default function Hero() {
 
             {/* CTAs */}
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6, ease }}
+              variants={rise} custom={0.5}
+              initial="hidden" animate={anim}
               className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4"
             >
-              <motion.a
-                href={hero.primaryCta.href}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="btn btn-fire btn-lg"
-              >
-                {hero.primaryCta.label.replace(/→$/, "")} <ArrowRight size={14} />
-              </motion.a>
+              <ShinyButton href={hero.primaryCta.href}>
+                <span className="inline-flex items-center gap-2">
+                  {hero.primaryCta.label.replace(/→$/, "")} <ArrowRight size={14} />
+                </span>
+              </ShinyButton>
               <motion.a
                 href={hero.secondaryCta.href}
                 whileHover={{ scale: 1.02 }}
@@ -97,9 +109,8 @@ export default function Hero() {
 
             {/* Trust row */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
+              variants={fadeIn} custom={0.68}
+              initial="hidden" animate={anim}
               className="mt-12 pt-7 hairline-t flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3"
             >
               {hero.features.slice(0, 3).map((f, i) => (
@@ -114,9 +125,9 @@ export default function Hero() {
           {/* ── Product showcase column ── */}
           <motion.div style={{ y: yImg }} className="relative pb-10 lg:pb-0">
             <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4, ease }}
+              initial={{ opacity: 0, y: 70, scale: 0.96 }}
+              animate={started ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{ duration: 1.05, delay: 0.3, ease }}
               className="relative mx-auto max-w-[400px] lg:max-w-none"
             >
               {/* Featured card */}
@@ -141,11 +152,16 @@ export default function Hero() {
 
               {/* Floating secondary */}
               <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                initial={{ opacity: 0, y: 30, scale: 0.85 }}
+                animate={started ? { opacity: 1, y: 0, scale: 1 } : {}}
+                transition={{ duration: 0.8, delay: 0.75, ease }}
                 className="absolute -bottom-8 -left-4 sm:-left-10 w-[140px] sm:w-[170px]"
               >
-                <div className="rounded-[18px] overflow-hidden bg-white shadow-[0_16px_40px_rgba(0,0,0,0.07)] border border-line">
+                <motion.div
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="rounded-[18px] overflow-hidden bg-white shadow-[0_16px_40px_rgba(0,0,0,0.07)] border border-line"
+                >
                   {secondary?.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={secondary.image} alt={secondary.name} loading="lazy" decoding="async"
@@ -158,16 +174,22 @@ export default function Hero() {
                   <p className="px-3.5 py-2.5 text-[11px] font-semibold text-ink truncate border-t border-line">
                     {secondary?.name}
                   </p>
-                </div>
+                </motion.div>
               </motion.div>
 
               {/* Tri-color dots accent */}
               <motion.div
-                animate={{ y: [0, -4, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={started ? { opacity: 1, scale: 1 } : {}}
+                transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.95 }}
                 className="absolute -top-7 right-6 sm:right-10"
               >
-                <TriDots size="md" />
+                <motion.div
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                >
+                  <TriDots size="md" />
+                </motion.div>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -175,7 +197,12 @@ export default function Hero() {
       </motion.div>
 
       {/* Trust marquee */}
-      <div className="absolute bottom-0 inset-x-0 z-30 border-t border-line bg-white/80 backdrop-blur-xl overflow-hidden">
+      <motion.div
+        initial={{ y: "110%" }}
+        animate={started ? { y: "0%" } : {}}
+        transition={{ duration: 0.9, delay: 0.6, ease }}
+        className="absolute bottom-0 inset-x-0 z-30 border-t border-line bg-white/80 backdrop-blur-xl overflow-hidden"
+      >
         <div className="flex w-max">
           <div className="anim-marquee flex shrink-0 items-center">
             {[0, 1].map((dup) => (
@@ -190,7 +217,7 @@ export default function Hero() {
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

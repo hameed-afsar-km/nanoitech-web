@@ -5,6 +5,7 @@ import { ArrowUpRight, Mail, MessageSquare, Phone } from "lucide-react";
 import { useSiteContent } from "@/lib/site-content-context";
 import { GrainVeil } from "./backdrops";
 import { Reveal } from "./motion";
+import { ShinyButton } from "@/components/ui/shiny-button";
 
 const PARTNER_OPTIONS = [
   { id: "aqua", label: "Aquaculture & Hatcheries", query: "Aquaculture bulk order / trial collaboration" },
@@ -125,15 +126,17 @@ export default function CtaBand() {
               })}
             </div>
 
-            <motion.a href={waUrl} target="_blank" rel="noopener"
-              whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-              className="flex w-full items-center justify-center gap-2 bg-magenta text-white px-6 py-3.5 text-[12px] font-semibold uppercase tracking-wide hover:bg-magenta-deep transition-all rounded-full">
-              <MessageSquare size={14} /> Start a Conversation
-            </motion.a>
+            <div className="flex justify-center">
+              <ShinyButton href={waUrl} target="_blank" rel="noopener">
+                <span className="inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wide">
+                  <MessageSquare size={14} /> Start a Conversation
+                </span>
+              </ShinyButton>
+            </div>
             <motion.a
               href={`mailto:${contact.email}?subject=${encodeURIComponent(`Inquiry: ${selected.query}`)}`}
               whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-              className="mt-3 flex w-full items-center justify-center gap-2 border border-line bg-transparent text-ink px-6 py-3.5 text-[12px] font-semibold uppercase tracking-wide hover:bg-ink hover:text-cream transition-all rounded-full">
+              className="mt-4 flex w-full items-center justify-center gap-2 border border-line bg-transparent text-ink px-6 py-3.5 text-[12px] font-semibold uppercase tracking-wide hover:bg-ink hover:text-cream transition-all rounded-full">
               <Mail size={14} /> Send via Email
             </motion.a>
           </motion.div>

@@ -146,7 +146,7 @@ export default function Products() {
                       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                       className="relative bg-white rounded-[20px] overflow-hidden border border-line shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.06)] transition-shadow duration-300"
                     >
-                      <div className="relative overflow-hidden aspect-[3/4]">
+                      <div className="relative overflow-hidden aspect-square">
                         {p.badge && (
                           <motion.span
                             initial={{ opacity: 0, x: -20 }}
@@ -161,7 +161,7 @@ export default function Products() {
                         )}
                         {p.image ? (
                           <img src={p.image} alt={p.name} loading="lazy" decoding="async"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+                            className="w-full h-full object-contain bg-white transition-transform duration-700 group-hover:scale-[1.04]" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${filterColor}08, ${filterColor}15)` }}>
                             <TriDots />
@@ -244,7 +244,7 @@ export default function Products() {
               <div className="grid sm:grid-cols-[280px_1fr] gap-5 sm:gap-8 p-4 sm:p-6">
                 <div className="relative rounded-[16px] overflow-hidden bg-cream-2 aspect-square min-h-[250px]">
                   {modal.image ? (
-                    <img src={modal.image} alt={modal.name} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={modal.image} alt={modal.name} className="w-full aspect-square object-contain bg-white block" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center"><TriDots size="lg" /></div>
                   )}

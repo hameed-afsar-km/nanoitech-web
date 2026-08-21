@@ -3,7 +3,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { useSiteContent } from "@/lib/site-content-context";
 import { Reveal } from "./motion";
-import { ContourBands, ContourRings } from "./backdrops";
+import { ContourRings, LeafWash } from "./backdrops";
 import { MissionSection, VisionSection } from "./mission-vision";
 import { Lightbox } from "./lightbox";
 
@@ -35,7 +35,7 @@ export default function About() {
     <>
       {/* ── Stats Section (Light) ─────────────────────────── */}
       <section id="about" className="relative bg-green-light overflow-hidden">
-        <ContourBands />
+        <LeafWash />
         <div className="wrap relative z-10 py-16 lg:py-20">
           <Reveal>
             <div className="text-center max-w-[800px] mx-auto mb-10 lg:mb-14">

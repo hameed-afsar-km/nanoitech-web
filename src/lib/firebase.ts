@@ -4,7 +4,7 @@ import {
   getFirestore,
   initializeFirestore,
   persistentLocalCache,
-  persistentMultipleTabManager,
+  persistentSingleTabManager,
   type Firestore,
 } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
@@ -37,11 +37,15 @@ export function getDb(): Firestore {
   if (!db) {
     try {
       /* Persistent cache: content stays readable while offline and
-         snapshots are served instantly from IndexedDB on reload. */
+         snapshots are served instantly from IndexedDB on reload.
+         Single-tab manager avoids cross-tab lease contention. */
       db = initializeFirestore(getFirebaseApp(), {
         localCache: persistentLocalCache({
-          tabManager: persistentMultipleTabManager(),
+          tabManager: persistentSingleTabManager({ forceOwnership: false }),
         }),
+        /* Editors may leave optional fields undefined — drop them
+           instead of failing the whole write. */
+        ignoreUndefinedProperties: true,
       });
     } catch {
       db = getFirestore(getFirebaseApp());

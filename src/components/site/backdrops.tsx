@@ -398,6 +398,70 @@ export function DotField({ className = "" }: { className?: string }) {
   );
 }
 
+/* ── LeafWash — light botanical backdrop ────────────────────────
+   Oversized leaf line-art on opposing corners drifting gently,
+   over soft white/brand color washes. For pale sections.        */
+function LeafArt({ stroke, opacity }: { stroke: string; opacity: number }) {
+  return (
+    <svg viewBox="0 0 240 240" fill="none" className="w-full h-auto">
+      <g stroke={stroke} strokeOpacity={opacity} strokeWidth="2" strokeLinecap="round">
+        <path d="M14 226 C 34 132, 118 46, 228 12 C 204 112, 128 194, 14 226 Z" />
+        <path d="M26 218 C 78 160, 152 84, 220 22" />
+        <path d="M66 176 C 76 154, 92 134, 112 120" />
+        <path d="M108 140 C 118 120, 134 102, 156 90" />
+        <path d="M52 198 C 46 176, 44 152, 48 130" />
+        <path d="M94 162 C 86 142, 82 120, 84 98" />
+      </g>
+    </svg>
+  );
+}
+
+export function LeafWash({ className = "" }: { className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+    >
+      {/* Soft washes */}
+      <div
+        className="absolute -top-[28%] left-[18%] w-[58vw] h-[58vw] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.7), transparent 65%)" }}
+      />
+      <div
+        className="absolute -bottom-[30%] -right-[12%] w-[48vw] h-[48vw] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(214,35,107,0.06), transparent 62%)" }}
+      />
+      <div
+        className="absolute top-[18%] -left-[16%] w-[44vw] h-[44vw] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(232,114,12,0.05), transparent 60%)" }}
+      />
+
+      {/* Botanical line-art */}
+      <div className="lw-pos" style={{ left: "-72px", bottom: "-84px", width: "min(38vw, 400px)" }}>
+        <div className="lw-leaf">
+          <LeafArt stroke="#2f8f4e" opacity={0.16} />
+        </div>
+      </div>
+      <div className="lw-pos" style={{ right: "-64px", top: "-72px", width: "min(31vw, 330px)" }}>
+        <div className="lw-leaf lw-mirror lw-delay">
+          <LeafArt stroke="#d6236b" opacity={0.11} />
+        </div>
+      </div>
+
+      <style>{`
+        .lw-pos { position: absolute; }
+        .lw-leaf { animation: lw-sway 9s ease-in-out infinite alternate; }
+        .lw-mirror svg { transform: scaleX(-1); }
+        .lw-delay { animation-delay: -4.5s; }
+        @keyframes lw-sway {
+          from { transform: rotate(-2.5deg); }
+          to   { transform: rotate(2.5deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 /* ── GrainVeil — fine paper-grain texture ─────────────────────── */
 const NOISE_URI =
   "data:image/svg+xml," +
